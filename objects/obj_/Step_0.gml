@@ -15,7 +15,8 @@ if (keyboard_check_pressed(ord("R"))) {
 
 if (state == STATES.HIT) {
 	var _recoil_step = move_x * 0.2;
-	if (!place_meeting(x + _recoil_step, y, obj_collision)) {
+	// MODIFICATION : Collision de recul avec la tilemap
+	if (!place_meeting(x + _recoil_step, y, tilemap_terrain)) {
 		x += _recoil_step;
 	} else {
 		move_x = 0;
@@ -27,7 +28,8 @@ if (state == STATES.HIT) {
 // -----------------------------------------------------------------------------
 // Detection du sol et de la plateforme porteuse
 // -----------------------------------------------------------------------------
-touch_floor = place_meeting(x, y + 1, obj_collision);
+// MODIFICATION : Détection du sol via la tilemap
+touch_floor = place_meeting(x, y + 1, tilemap_terrain);
 touch_platform = place_meeting(x, y + 1, obj_platform);
 
 if (touch_platform) {
@@ -70,10 +72,11 @@ if (state != STATES.HIT) {
 // Accrochage au mur
 // -----------------------------------------------------------------------------
 if (state == STATES.FALL) {
-	var wall_collision = place_meeting(x + move_x, y, obj_wall);
+	// MODIFICATION : On s'accroche désormais aux tuiles du terrain directement
+	var wall_collision = place_meeting(x + move_x, y, tilemap_terrain);
 
 	if (wall_collision) {
-		while (!place_meeting(x + sign(move_x), y, obj_wall)) {
+		while (!place_meeting(x + sign(move_x), y, tilemap_terrain)) {
 			x += sign(move_x);
 		}
 
@@ -93,14 +96,14 @@ if (state == STATES.WALL) {
 	if (touch_floor) {
 		state = STATES.IDLE;
 
-		while (!place_meeting(x, y + sign(move_y), obj_collision)) {
+		while (!place_meeting(x, y + sign(move_y), tilemap_terrain)) {
 			y += sign(move_y);
 		}
 
 		move_y = 0;
 	}
 
-	if (!place_meeting(x + wall_dir, y, obj_wall)
+	if (!place_meeting(x + wall_dir, y, tilemap_terrain)
 		|| (move_dir != 0 && move_dir != wall_dir)) {
 		state = STATES.FALL;
 	}
@@ -112,7 +115,7 @@ if (state == STATES.WALL) {
 if (state == STATES.JUMP || state == STATES.DOUBLEJUMP) {
 	move_y += fall_speed;
 
-	if (place_meeting(x, y + move_y, obj_collision)) {
+	if (place_meeting(x, y + move_y, tilemap_terrain)) {
 		move_y = 0;
 		state = STATES.FALL;
 	} else if (move_y >= 0) {
@@ -126,13 +129,13 @@ if (state == STATES.JUMP || state == STATES.DOUBLEJUMP) {
 if (state == STATES.FALL) {
 	move_y += fall_speed;
 
-	if (place_meeting(x, y + move_y, obj_collision)) {
+	if (place_meeting(x, y + move_y, tilemap_terrain)) {
 		move_y = 0;
 		state = STATES.IDLE;
 		can_doble_jump = true;
 
 		// Replace l'objet juste au-dessus du sol.
-		while (!place_meeting(x, y + 1, obj_collision)) {
+		while (!place_meeting(x, y + 1, tilemap_terrain)) {
 			y += 1;
 		}
 	}
@@ -165,11 +168,11 @@ if (move_dir != 0 && state == STATES.IDLE) {
 // -----------------------------------------------------------------------------
 // Déplacement horizontal et résolution des collisions
 // -----------------------------------------------------------------------------
-if (place_meeting(x + move_x, y, obj_collision)) {
+if (place_meeting(x + move_x, y, tilemap_terrain)) {
 	var horizontal_direction = sign(move_x);
 
 	while (horizontal_direction != 0
-		&& !place_meeting(x + horizontal_direction, y, obj_collision)) {
+		&& !place_meeting(x + horizontal_direction, y, tilemap_terrain)) {
 		x += horizontal_direction;
 	}
 

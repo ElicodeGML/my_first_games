@@ -22,3 +22,6 @@ animation_ended = false;
 
 // Plateforme actuellement porteuse.
 platform_id = noone;
+
+// On stocke l'ID technique de votre calque de tuiles existant
+tilemap_terrain = layer_tilemap_get_id("t_terrain");
